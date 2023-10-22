@@ -16,3 +16,5 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('{view}', \App\Http\Controllers\ApplicationController::class)->where('view', '(.*)');
