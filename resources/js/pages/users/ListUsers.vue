@@ -4,11 +4,22 @@ import {Form, Field} from "vee-validate";
 import * as yub from 'yup';
 
 const users = ref([]);
+const editing = ref(false);
+const formValues = ref();
+const form = ref();
 
-const schema = yub.object({
+const createUserSchema = yub.object({
     name: yub.string().required(),
     email: yub.string().email().required(),
     password: yub.string().required().min(8)
+});
+
+const editUserSchema = yub.object({
+    name: yub.string().required(),
+    email: yub.string().email().required(),
+    password: yub.string().when((password, schema) => {
+        return password ? schema.min(8) : schema;
+    })
 });
 
 const getUsers = () => {
@@ -21,12 +32,45 @@ onMounted(() => {
     getUsers();
 });
 
-const createUser = (values, { resetForm }) => {
+const createUser = (values) => {
     axios.post('http://laravel-vue-youtube-clovon.test/api/users', values).then((response) => {
         users.value.unshift(response.data);
-        resetForm()
-        $('#createUserModal').modal('hide');
+        $('#userFormModal').modal('hide');
+    }).finally(() => {
+        form.value.resetForm();
     })
+}
+
+const updateUser = (values) => {
+    axios.put('http://laravel-vue-youtube-clovon.test/api/users/' + formValues.value.id, values).then((response) => {
+        const index = users.value.findIndex(user => user.id === response.data.id);
+        users.value[index] = response.data;
+        $('#userFormModal').modal('hide');
+    }).catch((error) => {
+        console.log(error);
+    }).finally(() => {
+        form.value.resetForm();
+    })
+}
+
+const adduser = () => {
+    editing.value = false;
+    $('#userFormModal').modal('show');
+}
+
+const editUser = (user) => {
+    editing.value = true;
+    form.value.resetForm()
+    $('#userFormModal').modal('show');
+    formValues.value = {
+        id: user.id,
+        name: user.name,
+        email: user.email
+    };
+}
+
+const handleSubmit = (values) => {
+    editing.value ? updateUser(values) : createUser(values)
 }
 </script>
 
@@ -50,8 +94,8 @@ const createUser = (values, { resetForm }) => {
     <div class="content">
         <div class="container-fluid">
             <!-- Button trigger modal -->
-            <button class="mb-2 btn btn-primary" data-target="#createUserModal" data-toggle="modal" type="button">
-                Launch demo modal
+            <button @click="adduser" class="mb-2 btn btn-primary" type="button">
+                New User
             </button>
 
             <div class="card-body table-responsive p-0">
@@ -61,6 +105,9 @@ const createUser = (values, { resetForm }) => {
                         <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
+                        <th>Role</th>
+                        <th>Created at</th>
+                        <th>Options</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -68,18 +115,28 @@ const createUser = (values, { resetForm }) => {
                         <td>{{ user.id }}</td>
                         <td>{{ user.name }}</td>
                         <td>{{ user.email }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <a href="" @click.prevent="editUser(user)">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <div id="createUserModal" aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" tabindex="-1">
+        <div id="userFormModal" aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" tabindex="-1">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <Form @submit="createUser" :validation-schema="schema" v-slot="{ errors }">
+                    <Form ref="form" @submit="handleSubmit" :validation-schema="editing ? editUserSchema : createUserSchema" v-slot="{ errors }" :initial-values="formValues">
                     <div class="modal-header">
-                        <h1 id="exampleModalLabel" class="modal-title h3 fs-5">Add New User</h1>
+                        <h1 id="exampleModalLabel" class="modal-title h3 fs-5">
+                            <span v-if="editing">Edit User</span>
+                            <span v-else>Add New User</span>
+                        </h1>
                         <button aria-label="Close" class="btn-close" data-dismiss="modal" type="button"></button>
                     </div>
                     <div class="modal-body">

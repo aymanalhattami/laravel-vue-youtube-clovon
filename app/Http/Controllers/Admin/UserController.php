@@ -19,4 +19,11 @@ class UserController extends Controller
     {
         return User::create($request->all());
     }
+
+    public function update(Request $request, User $user)
+    {
+        $user->update($request->all());
+
+        return $user;
+    }
 }
