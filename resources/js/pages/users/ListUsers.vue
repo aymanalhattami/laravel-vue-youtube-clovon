@@ -1,11 +1,14 @@
 <script setup>
 import {onMounted, reactive, ref} from "vue";
+import {Form, Field} from "vee-validate";
+import * as yub from 'yup';
 
 const users = ref([]);
-const form = reactive({
-    name: '',
-    email: '',
-    password: ''
+
+const schema = yub.object({
+    name: yub.string().required(),
+    email: yub.string().email().required(),
+    password: yub.string().required().min(8)
 });
 
 const getUsers = () => {
@@ -18,14 +21,10 @@ onMounted(() => {
     getUsers();
 });
 
-const createUser = () => {
-    axios.post('http://laravel-vue-youtube-clovon.test/api/users', form).then((response) => {
+const createUser = (values, { resetForm }) => {
+    axios.post('http://laravel-vue-youtube-clovon.test/api/users', values).then((response) => {
         users.value.unshift(response.data);
-
-        form.name = '';
-        form.email = '';
-        form.password = '';
-
+        resetForm()
         $('#createUserModal').modal('hide');
     })
 }
@@ -75,10 +74,10 @@ const createUser = () => {
             </div>
         </div>
 
-        <div id="createUserModal" aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade"
-             tabindex="-1">
+        <div id="createUserModal" aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" tabindex="-1">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
+                    <Form @submit="createUser" :validation-schema="schema" v-slot="{ errors }">
                     <div class="modal-header">
                         <h1 id="exampleModalLabel" class="modal-title h3 fs-5">Add New User</h1>
                         <button aria-label="Close" class="btn-close" data-dismiss="modal" type="button"></button>
@@ -86,21 +85,25 @@ const createUser = () => {
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label" for="exampleFormControlInput1">Name</label>
-                            <input class="form-control" placeholder="Jone Doe" v-model="form.name" type="text">
+                            <Field class="form-control" placeholder="Jone Doe" name="name" type="text" :class="{ 'is-invalid': errors.name }" />
+                            <span class="text-danger">{{ errors.name }}</span>
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="exampleFormControlInput1">Email address</label>
-                            <input class="form-control" placeholder="name@example.com" v-model="form.email" type="email">
+                            <Field class="form-control" placeholder="name@example.com" name="email" type="email" :class="{ 'is-invalid': errors.email }" />
+                            <span class="text-danger">{{ errors.email }}</span>
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="exampleFormControlInput1">Password</label>
-                            <input class="form-control" placeholder="" v-model="form.password" type="password">
+                            <Field class="form-control" placeholder="" name="password" type="password" :class="{ 'is-invalid': errors.password }" />
+                            <span class="text-danger">{{ errors.password }}</span>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
-                        <button class="btn btn-primary" type="button" @click="createUser">Save</button>
+                        <button class="btn btn-primary" type="submit">Save</button>
                     </div>
+                    </Form>
                 </div>
             </div>
         </div>
