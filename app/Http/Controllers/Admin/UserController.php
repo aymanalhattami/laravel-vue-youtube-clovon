@@ -4,15 +4,24 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Utilities\Date;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $user = User::latest()->get();
+        $users = User::latest()->get()->map(function($user) {
+            return [
+               'id' => $user->id,
+               'name' => $user->name,
+               'email' => $user->email,
+               'role' => $user->role,
+               'created_at' => $user->created_at->format('Y-m-d'),
+            ];
+        });
 
-        return $user;
+        return $users;
     }
 
     public function store(Request $request)
