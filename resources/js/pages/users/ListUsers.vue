@@ -2,11 +2,13 @@
 import {onMounted, reactive, ref} from "vue";
 import {Form, Field} from "vee-validate";
 import * as yub from 'yup';
+import {useToastr} from "@/toastr.js";
 
 const users = ref([]);
 const editing = ref(false);
 const formValues = ref();
 const form = ref();
+const toastr = useToastr();
 
 const createUserSchema = yub.object({
     name: yub.string().required(),
@@ -37,6 +39,7 @@ const createUser = (values, { resetForm, setErrors }) => {
         users.value.unshift(response.data);
         $('#userFormModal').modal('hide');
         form.value.resetForm();
+        toastr.success('Created Successfully');
     }).catch((error) => {
         if(error.response.data.errors){
             setErrors(error.response.data.errors);
@@ -50,6 +53,7 @@ const updateUser = (values, { setErrors }) => {
         users.value[index] = response.data;
         $('#userFormModal').modal('hide');
         form.value.resetForm();
+        toastr.success('Updated Successfully');
     }).catch((error) => {
         if(error.response.data.errors){
             setErrors(error.response.data.errors);
