@@ -32,25 +32,33 @@ onMounted(() => {
     getUsers();
 });
 
-const createUser = (values) => {
+const createUser = (values, { resetForm, setErrors }) => {
     axios.post('http://laravel-vue-youtube-clovon.test/api/users', values).then((response) => {
         users.value.unshift(response.data);
         $('#userFormModal').modal('hide');
-    }).finally(() => {
         form.value.resetForm();
+    }).catch((error) => {
+        if(error.response.data.errors){
+            setErrors(error.response.data.errors);
+        }
     })
 }
 
-const updateUser = (values) => {
+const updateUser = (values, { setErrors }) => {
     axios.put('http://laravel-vue-youtube-clovon.test/api/users/' + formValues.value.id, values).then((response) => {
         const index = users.value.findIndex(user => user.id === response.data.id);
         users.value[index] = response.data;
         $('#userFormModal').modal('hide');
-    }).catch((error) => {
-        console.log(error);
-    }).finally(() => {
         form.value.resetForm();
+    }).catch((error) => {
+        if(error.response.data.errors){
+            setErrors(error.response.data.errors);
+        }
+        console.log(error);
     })
+    //     .finally(() => {
+    //         form.value.resetForm();
+    // })
 }
 
 const adduser = () => {
@@ -69,8 +77,8 @@ const editUser = (user) => {
     };
 }
 
-const handleSubmit = (values) => {
-    editing.value ? updateUser(values) : createUser(values)
+const handleSubmit = (values, actions) => {
+    editing.value ? updateUser(values, actions) : createUser(values, actions)
 }
 </script>
 
