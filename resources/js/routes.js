@@ -1,6 +1,6 @@
 import Dashboard from "./components/Dashboard.vue";
 import ListAppointments from "./pages/appointements/ListAppointments.vue";
-import ListUsers from "@/pages/users/ListUsers.vue";
+import ListUsers from "@/pages/users/UserList.vue";
 import UpdateSetting from "@/pages/settings/UpdateSetting.vue";
 import UpdateProfile from "@/pages/profile/UpdateProfile.vue";
 
