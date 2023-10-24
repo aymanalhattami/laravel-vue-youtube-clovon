@@ -30,6 +30,26 @@ const deleteUser = () => {
 const editUser = (user) => {
     emit('editUser', user);
 }
+
+const roles = ref([
+    {
+        name: 'Admin',
+        value: 1
+    },
+    {
+        name: 'User',
+        value: 2
+    }
+])
+
+const changeRole = (user, role) => {
+    axios.put('http://laravel-vue-youtube-clovon.test/api/users/' + user.id + '/change-role', {
+        role: role
+    })
+        .then((response) => {
+            toastr.success('role changes');
+        })
+}
 </script>
 
 <template>
@@ -37,7 +57,11 @@ const editUser = (user) => {
         <td>{{ user.id }}</td>
         <td>{{ user.name }}</td>
         <td>{{ user.email }}</td>
-        <td>{{ user.role }}</td>
+        <td>
+            <select class="form-control" @change="changeRole(user, $event.target.value)">
+                <option v-for="role in roles" :value="role.value" :selected="user.role === role.name">{{ role.name }}</option>
+            </select>
+        </td>
         <td>{{ user.created_at }}</td>
         <td>
             <a href="" @click.prevent="editUser(user)">
