@@ -3,7 +3,7 @@ import {onMounted, reactive, ref, watch} from "vue";
 import {Form, Field} from "vee-validate";
 import * as yub from 'yup';
 import {useToastr} from "@/toastr.js";
-import UserListItem from "@/pages/users/UserListItem.vue";
+import UserListItem from "../users/UserListItem.vue";
 import { debounce } from "lodash";
 import { Bootstrap4Pagination } from 'laravel-vue-pagination';
 
@@ -108,6 +108,32 @@ const search = () => {
     })
 }
 
+const selectedUsers = ref([]);
+
+const toggleSelection = (user) => {
+    const index = selectedUsers.value.indexOf(user.id);
+    if(index === -1){
+        selectedUsers.value.push(user.id);
+    }else{
+        selectedUsers.value.splice(index, 1);
+    }
+
+    console.log(selectedUsers.value);
+}
+
+const bulkDelete = () => {
+axios.delete('http://laravel-vue-youtube-clovon.test/api/users', {
+    data: {
+        ids: selectedUsers.value
+    }
+})
+    .then(() => {
+        users.value.data = users.value.data.filter((user) => !selectedUsers.value.includes(user.id));
+        selectedUsers.value = [];
+        toastr.success('deleted successfully');
+    })
+};
+
 </script>
 
 <template>
@@ -131,9 +157,15 @@ const search = () => {
         <div class="container-fluid">
             <!-- Button trigger modal -->
             <div class="d-flex justify-content-between">
-                <button @click="adduser" class="mb-2 btn btn-primary" type="button">
-                    New User
-                </button>
+                <div>
+                    <button @click="adduser" class="mb-2 btn btn-primary" type="button">
+                        New User
+                    </button>
+
+                    <button v-show="selectedUsers.length > 0" @click="bulkDelete" class="ml-2 mb-2 btn btn-danger" type="button">
+                        Delete selected
+                    </button>
+                </div>
 
                 <div class="d-flex">
                     <input type="search" class="form-control" placeholder="search" v-model="searchQuery">
@@ -144,6 +176,7 @@ const search = () => {
                 <table class="table table-hover text-nowrap">
                     <thead>
                     <tr>
+                        <th><input type="checkbox" /> </th>
                         <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
@@ -159,6 +192,7 @@ const search = () => {
                         :user="user"
                         @user-deleted="userDeleted"
                         @edit-user="editUser"
+                        @toggle-selection="toggleSelection"
                     />
                     </tbody>
                     <tbody v-else>

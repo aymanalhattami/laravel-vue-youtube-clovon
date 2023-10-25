@@ -60,4 +60,11 @@ class UserController extends Controller
 
         return $user;
     }
+
+    public function bulkDelete(Request $request)
+    {
+        User::whereIn('id', $request->ids)->delete();
+
+        return response()->noContent();
+    }
 }

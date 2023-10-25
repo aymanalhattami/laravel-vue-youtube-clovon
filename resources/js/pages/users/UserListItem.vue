@@ -4,11 +4,11 @@ import {useToastr} from "@/toastr.js";
 
 const toastr = useToastr();
 
-defineProps({
+const props = defineProps({
     user: Object
 })
 
-const emit = defineEmits(['userDeleted', 'editUser'])
+const emit = defineEmits(['userDeleted', 'editUser', 'toggleSelection'])
 
 const userIdBeingDeleted = ref(null);
 
@@ -50,10 +50,15 @@ const changeRole = (user, role) => {
             toastr.success('role changes');
         })
 }
+
+const toggleSelection = () => {
+    emit('toggleSelection', props.user);
+}
 </script>
 
 <template>
     <tr>
+        <td><input type="checkbox" @change="toggleSelection" /></td>
         <td>{{ user.id }}</td>
         <td>{{ user.name }}</td>
         <td>{{ user.email }}</td>
