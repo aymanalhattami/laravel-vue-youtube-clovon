@@ -130,9 +130,20 @@ axios.delete('http://laravel-vue-youtube-clovon.test/api/users', {
     .then(() => {
         users.value.data = users.value.data.filter((user) => !selectedUsers.value.includes(user.id));
         selectedUsers.value = [];
+        selectAll.value = [];
         toastr.success('deleted successfully');
     })
 };
+
+const selectAll = ref(false);
+
+const selectAllUsers = () => {
+    if(selectAll.value){
+        selectedUsers.value = users.value.data.map((user) => user.id);
+    }else{
+        selectedUsers.value = [];
+    }
+}
 
 </script>
 
@@ -176,7 +187,7 @@ axios.delete('http://laravel-vue-youtube-clovon.test/api/users', {
                 <table class="table table-hover text-nowrap">
                     <thead>
                     <tr>
-                        <th><input type="checkbox" /> </th>
+                        <th><input v-model="selectAll" type="checkbox" @change="selectAllUsers" /> </th>
                         <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
@@ -193,6 +204,7 @@ axios.delete('http://laravel-vue-youtube-clovon.test/api/users', {
                         @user-deleted="userDeleted"
                         @edit-user="editUser"
                         @toggle-selection="toggleSelection"
+                        :select-all="selectAll"
                     />
                     </tbody>
                     <tbody v-else>
