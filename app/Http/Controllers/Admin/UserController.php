@@ -11,32 +11,14 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::latest()->get()->map(function($user) {
-            return [
-               'id' => $user->id,
-               'name' => $user->name,
-               'email' => $user->email,
-               'role' => $user->role,
-               'created_at' => $user->created_at->format('Y-m-d'),
-            ];
-        });
+        $users = User::latest()->paginate(5);
 
         return $users;
     }
 
     public function search(Request $request)
     {
-        $users = User::where('name', 'like', '%' . $request['query'] .  '%')->get()->map(function($user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-                'created_at' => $user->created_at->format('Y-m-d'),
-            ];
-        });
-
-        return $users;
+        return User::where('name', 'like', '%' . $request['query'] .  '%')->paginate(5);
     }
 
     public function store(Request $request)

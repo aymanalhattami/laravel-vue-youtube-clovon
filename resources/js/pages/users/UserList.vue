@@ -5,8 +5,9 @@ import * as yub from 'yup';
 import {useToastr} from "@/toastr.js";
 import UserListItem from "@/pages/users/UserListItem.vue";
 import { debounce } from "lodash";
+import { Bootstrap4Pagination } from 'laravel-vue-pagination';
 
-const users = ref([]);
+const users = ref({data: []});
 const editing = ref(false);
 const formValues = ref();
 const form = ref();
@@ -26,8 +27,8 @@ const editUserSchema = yub.object({
     })
 });
 
-const getUsers = () => {
-    axios.get('http://laravel-vue-youtube-clovon.test/api/users').then((response) => {
+const getUsers = (page = 1) => {
+    axios.get(`http://laravel-vue-youtube-clovon.test/api/users?page=${page}`).then((response) => {
         users.value = response.data;
     })
 }
@@ -151,9 +152,9 @@ const search = () => {
                         <th>Options</th>
                     </tr>
                     </thead>
-                    <tbody v-if="users.length">
+                    <tbody v-if="users.data.length > 0">
                     <UserListItem
-                        v-for="user in users"
+                        v-for="user in users.data"
                         :key="user.id"
                         :user="user"
                         @user-deleted="userDeleted"
@@ -166,6 +167,7 @@ const search = () => {
                     </tr>
                     </tbody>
                 </table>
+                <Bootstrap4Pagination :data="users" @pagination-change-page="getUsers" />
             </div>
         </div>
 
