@@ -30,6 +30,8 @@ const editUserSchema = yub.object({
 const getUsers = (page = 1) => {
     axios.get(`http://laravel-vue-youtube-clovon.test/api/users?page=${page}`).then((response) => {
         users.value = response.data;
+        selectedUsers.value = [];
+        selectAll.value = false;
     })
 }
 
@@ -39,7 +41,7 @@ onMounted(() => {
 
 const createUser = (values, { resetForm, setErrors }) => {
     axios.post('http://laravel-vue-youtube-clovon.test/api/users', values).then((response) => {
-        users.value.unshift(response.data);
+        users.value.data.unshift(response.data);
         $('#userFormModal').modal('hide');
         form.value.resetForm();
         toastr.success('Created Successfully');
@@ -175,6 +177,7 @@ const selectAllUsers = () => {
 
                     <button v-show="selectedUsers.length > 0" @click="bulkDelete" class="ml-2 mb-2 btn btn-danger" type="button">
                         Delete selected
+                        <span>({{ selectedUsers.length }})</span>
                     </button>
                 </div>
 
