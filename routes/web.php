@@ -25,4 +25,6 @@ Route::put('api/users/{user}', [\App\Http\Controllers\Admin\UserController::clas
 Route::delete('api/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'delete']);
 Route::delete('api/users', [\App\Http\Controllers\Admin\UserController::class, 'bulkDelete']);
 
+Route::get('api/appointments', [\App\Http\Controllers\Admin\AppointmentController::class, 'index']);
+
 Route::get('{view}', \App\Http\Controllers\ApplicationController::class)->where('view', '(.*)');
