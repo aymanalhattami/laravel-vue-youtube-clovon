@@ -1,9 +1,10 @@
 <script setup>
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
 import {Form, Field} from "vee-validate";
 import * as yub from 'yup';
 import {useToastr} from "@/toastr.js";
 import UserListItem from "@/pages/users/UserListItem.vue";
+import { debounce } from "lodash";
 
 const users = ref([]);
 const editing = ref(false);
@@ -87,6 +88,25 @@ const userDeleted = (userId) => {
     users.value = users.value.filter(user => user.id !== userId);
 }
 
+const searchQuery = ref(null);
+
+watch(searchQuery, debounce(() => {
+    search();
+}, 300))
+
+const search = () => {
+    axios.get('http://laravel-vue-youtube-clovon.test/api/users/search', {
+        params: {
+            query: searchQuery.value
+        }
+    })
+        .then((response) => {
+            users.value = response.data;
+        }).catch((error) => {
+            toastr.error(error.response.data.message)
+    })
+}
+
 </script>
 
 <template>
@@ -109,9 +129,15 @@ const userDeleted = (userId) => {
     <div class="content">
         <div class="container-fluid">
             <!-- Button trigger modal -->
-            <button @click="adduser" class="mb-2 btn btn-primary" type="button">
-                New User
-            </button>
+            <div class="d-flex justify-content-between">
+                <button @click="adduser" class="mb-2 btn btn-primary" type="button">
+                    New User
+                </button>
+
+                <div class="d-flex">
+                    <input type="search" class="form-control" placeholder="search" v-model="searchQuery">
+                </div>
+            </div>
 
             <div class="card-body table-responsive p-0">
                 <table class="table table-hover text-nowrap">
@@ -125,7 +151,7 @@ const userDeleted = (userId) => {
                         <th>Options</th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="users.length">
                     <UserListItem
                         v-for="user in users"
                         :key="user.id"
@@ -133,6 +159,11 @@ const userDeleted = (userId) => {
                         @user-deleted="userDeleted"
                         @edit-user="editUser"
                     />
+                    </tbody>
+                    <tbody v-else>
+                    <tr>
+                        <td colspan="6" class="text-center">No data</td>
+                    </tr>
                     </tbody>
                 </table>
             </div>

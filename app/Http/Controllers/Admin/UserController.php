@@ -24,6 +24,21 @@ class UserController extends Controller
         return $users;
     }
 
+    public function search(Request $request)
+    {
+        $users = User::where('name', 'like', '%' . $request['query'] .  '%')->get()->map(function($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'created_at' => $user->created_at->format('Y-m-d'),
+            ];
+        });
+
+        return $users;
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -62,6 +77,5 @@ class UserController extends Controller
         ]);
 
         return $user;
-
     }
 }
