@@ -57,10 +57,9 @@ import {onMounted, ref} from "vue";
                         <div class="col-lg-12">
                             <div class="d-flex justify-content-between mb-2">
                                 <div>
-                                    <a href="">
-                                        <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New
-                                            Appointment</button>
-                                    </a>
+                                    <router-link class="btn btn-primary" to="/admin/appointments/create">
+                                        <i class="fa fa-plus-circle mr-1"></i> Add New Appointment
+                                    </router-link>
                                 </div>
                                 <div class="btn-group">
                                     <button @click="getAppointments()" type="button" class="btn" :class="selectedStatus == null ? 'btn-secondary' : ''">

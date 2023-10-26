@@ -87,10 +87,6 @@ const handleSubmit = (values, actions) => {
     editing.value ? updateUser(values, actions) : createUser(values, actions)
 }
 
-const userDeleted = (userId) => {
-    users.value = users.value.filter(user => user.id !== userId);
-}
-
 const searchQuery = ref(null);
 
 watch(searchQuery, debounce(() => {
@@ -145,6 +141,23 @@ const selectAllUsers = () => {
     }else{
         selectedUsers.value = [];
     }
+}
+
+const userIdBeingDeleted = ref(null);
+
+const confirmUserDeletion = (id) => {
+    userIdBeingDeleted.value = id;
+    $('#deleteUserModal').modal('show');
+}
+
+const deleteUser = () => {
+    axios.delete('http://laravel-vue-youtube-clovon.test/api/users/' + userIdBeingDeleted.value).then((response) => {
+        toastr.success('Deleted Successfully');
+        users.value.data = users.value.data.filter(user => user.id !== userIdBeingDeleted.value)
+        $('#deleteUserModal').modal('hide');
+    }).catch((error) => {
+        toastr.error(error.response.data.message);
+    })
 }
 
 </script>
@@ -204,10 +217,10 @@ const selectAllUsers = () => {
                         v-for="user in users.data"
                         :key="user.id"
                         :user="user"
-                        @user-deleted="userDeleted"
                         @edit-user="editUser"
                         @toggle-selection="toggleSelection"
                         :select-all="selectAll"
+                        @confirm-user-deletion="confirmUserDeletion"
                     />
                     </tbody>
                     <tbody v-else>
@@ -253,6 +266,26 @@ const selectAllUsers = () => {
                         <button class="btn btn-primary" type="submit">Save</button>
                     </div>
                     </Form>
+                </div>
+            </div>
+        </div>
+
+        <div id="deleteUserModal" aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 id="exampleModalLabel" class="modal-title h3 fs-5">
+                            <span>Delete User</span>
+                        </h1>
+                        <button aria-label="Close" class="btn-close" data-dismiss="modal" type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure to delete ?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                        <button class="btn btn-danger" type="button" @click.prevent="deleteUser">Delete</button>
+                    </div>
                 </div>
             </div>
         </div>

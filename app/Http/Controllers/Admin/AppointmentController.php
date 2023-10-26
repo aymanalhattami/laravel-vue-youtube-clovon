@@ -12,6 +12,7 @@ class AppointmentController extends Controller
     public function index()
     {
         return Appointment::query()
+            ->latest()
             ->with('client:id,first_name,last_name')
             ->when(request()->status, function($query){
                 return $query->where('status', AppointmentStatus::from(request()->status));
@@ -30,5 +31,20 @@ class AppointmentController extends Controller
                     'client' => $appointment->client,
                 ];
             });
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => ['required'],
+            'description' => ['required'],
+            'client_id' => ['required'],
+            'start_time' => ['required'],
+            'end_time' => ['required'],
+        ]);
+
+        Appointment::create(array_merge($request->all(), ['status' => AppointmentStatus::Scheduled]));
+
+        return response()->json(['message' => 'created successfully']);
     }
 }
