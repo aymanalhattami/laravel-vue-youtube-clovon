@@ -26,8 +26,10 @@ Route::delete('api/users/{user}', [\App\Http\Controllers\Admin\UserController::c
 Route::delete('api/users', [\App\Http\Controllers\Admin\UserController::class, 'bulkDelete']);
 
 Route::get('api/appointments', [\App\Http\Controllers\Admin\AppointmentController::class, 'index']);
-Route::post('api/appointments', [\App\Http\Controllers\Admin\AppointmentController::class, 'store']);
 Route::get('api/appointments/status', [\App\Http\Controllers\Admin\AppointmentStatusController::class, 'index']);
+Route::get('api/appointments/{appointment}', [\App\Http\Controllers\Admin\AppointmentController::class, 'show']);
+Route::post('api/appointments', [\App\Http\Controllers\Admin\AppointmentController::class, 'store']);
+Route::put('api/appointments/{appointment}', [\App\Http\Controllers\Admin\AppointmentController::class, 'update']);
 
 Route::get('api/clients', [\App\Http\Controllers\Admin\ClientController::class, 'index']);
 

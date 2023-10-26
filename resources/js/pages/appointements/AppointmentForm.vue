@@ -2,14 +2,18 @@
 
 import { onMounted, reactive, ref } from "vue";
 import axios from "axios";
-import { useRouter } from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import { useToastr } from "@/toastr.js";
 import { Form } from 'vee-validate';
 import flatpickr from "flatpickr";
 import 'flatpickr/dist/themes/light.css';
 
 const router = useRouter();
+const route = useRoute();
 const toastr = useToastr();
+
+const editMode = ref(false);
+const clients = ref([]);
 
 const form = reactive({
     title: '',
@@ -19,14 +23,30 @@ const form = reactive({
     end_time: '',
 });
 
+const getAppointment = () => {
+  axios.get(`http://laravel-vue-youtube-clovon.test/api/appointments/${route.params.id}`)
+      .then((response) => {
+          form.title = response.data.title;
+          form.description = response.data.description;
+          form.client_id = response.data.client_id;
+          form.start_time = response.data.start_time;
+          form.end_time = response.data.end_time;
+      })
+};
+
 onMounted(() => {
+    if(route.name === 'admin.appointments.edit'){
+        editMode.value = true;
+
+        getAppointment();
+    }
+
     getClients();
+
     flatpickr('.flatpickr', {
         enableTime: true
     });
 })
-
-const clients = ref([]);
 
 const getClients = () => {
     axios.get('http://laravel-vue-youtube-clovon.test/api/clients')
@@ -36,6 +56,25 @@ const getClients = () => {
 }
 
 const handleSubmit = (values, actions) => {
+    if(editMode.value){
+        editAppointment(values, actions);
+    }else{
+        createAppointment(values, actions);
+    }
+}
+
+const editAppointment = (values, actions) => {
+    axios.put(`http://laravel-vue-youtube-clovon.test/api/appointments/${route.params.id}`, form)
+        .then((response) => {
+            router.push('/admin/appointments');
+            toastr.success(response.data.message);
+        })
+        .catch((error) => {
+            actions.setErrors(error.response.data.errors);
+        })
+}
+
+const createAppointment = (values, actions) => {
     axios.post('http://laravel-vue-youtube-clovon.test/api/appointments', form)
         .then((response) => {
             router.push('/admin/appointments');
@@ -53,7 +92,11 @@ const handleSubmit = (values, actions) => {
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Create Appointment</h1>
+                    <h1 class="m-0">
+                        <span v-if="editMode">Edit</span>
+                        <span v-else>Create</span>
+                        Appointment
+                    </h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -63,7 +106,10 @@ const handleSubmit = (values, actions) => {
                         <li class="breadcrumb-item">
                             <router-link to="/admin/appointments">Appointments</router-link>
                         </li>
-                        <li class="breadcrumb-item active">Create</li>
+                        <li class="breadcrumb-item active">
+                            <span v-if="editMode">Edit</span>
+                            <span v-else>Create</span>
+                        </li>
                     </ol>
                 </div>
             </div>

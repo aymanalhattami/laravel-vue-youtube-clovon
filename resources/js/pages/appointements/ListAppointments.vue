@@ -1,7 +1,10 @@
 <script setup>
 import {onMounted, ref} from "vue";
+import { useToastr } from "@/toastr.js";
 
-    onMounted(() => {
+const toastr = useToastr();
+
+onMounted(() => {
         getAppointments();
         getAppointmentStatus();
     })
@@ -28,7 +31,9 @@ import {onMounted, ref} from "vue";
         axios.get('http://laravel-vue-youtube-clovon.test/api/appointments/status')
             .then((response) => {
                 appointmentStatus.value = response.data;
-            })
+            }).catch((error) => {
+                toastr.error(error.response.data.message);
+        })
     }
 </script>
 
@@ -96,9 +101,9 @@ import {onMounted, ref} from "vue";
                                                 <span class="badge " :class="`badge-${appointment.status.color}`">{{ appointment.status.name }}</span>
                                             </td>
                                             <td>
-                                                <a href="">
+                                                <router-link :to="`/admin/appointments/${appointment.id}/edit`">
                                                     <i class="fa fa-edit mr-2"></i>
-                                                </a>
+                                                </router-link>
 
                                                 <a href="">
                                                     <i class="fa fa-trash text-danger"></i>
