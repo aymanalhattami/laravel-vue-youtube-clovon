@@ -29,4 +29,6 @@ Route::get('api/appointments', [\App\Http\Controllers\Admin\AppointmentControlle
 Route::post('api/appointments', [\App\Http\Controllers\Admin\AppointmentController::class, 'store']);
 Route::get('api/appointments/status', [\App\Http\Controllers\Admin\AppointmentStatusController::class, 'index']);
 
+Route::get('api/clients', [\App\Http\Controllers\Admin\ClientController::class, 'index']);
+
 Route::get('{view}', \App\Http\Controllers\ApplicationController::class)->where('view', '(.*)');

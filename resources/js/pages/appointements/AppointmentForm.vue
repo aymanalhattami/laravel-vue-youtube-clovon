@@ -1,6 +1,6 @@
 <script setup>
 
-import {onMounted, reactive} from "vue";
+import { onMounted, reactive, ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { useToastr } from "@/toastr.js";
@@ -20,10 +20,20 @@ const form = reactive({
 });
 
 onMounted(() => {
+    getClients();
     flatpickr('.flatpickr', {
         enableTime: true
     });
 })
+
+const clients = ref([]);
+
+const getClients = () => {
+    axios.get('http://laravel-vue-youtube-clovon.test/api/clients')
+        .then((response) => {
+            clients.value = response.data;
+        })
+}
 
 const handleSubmit = (values, actions) => {
     axios.post('http://laravel-vue-youtube-clovon.test/api/appointments', form)
@@ -80,8 +90,7 @@ const handleSubmit = (values, actions) => {
                                             <label for="client">Client Name</label>
                                             <select id="client" class="form-control" v-model="form.client_id" :class="{'is-invalid' : errors.client_id}">
                                                 <option value="">Select</option>
-                                                <option value="1">Client One</option>
-                                                <option value="2">Client Two</option>
+                                                <option v-for="client in clients" :value="client.id">{{ client.first_name }} {{ client.last_name }}</option>
                                             </select>
                                             <span class="text-danger">{{ errors.client_id }}</span>
                                         </div>
