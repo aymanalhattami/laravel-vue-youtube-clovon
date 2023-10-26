@@ -1,10 +1,12 @@
 <script setup>
 
-import {reactive} from "vue";
+import {onMounted, reactive} from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { useToastr } from "@/toastr.js";
 import { Form } from 'vee-validate';
+import flatpickr from "flatpickr";
+import 'flatpickr/dist/themes/light.css';
 
 const router = useRouter();
 const toastr = useToastr();
@@ -16,6 +18,12 @@ const form = reactive({
     start_time: '',
     end_time: '',
 });
+
+onMounted(() => {
+    flatpickr('.flatpickr', {
+        enableTime: true
+    });
+})
 
 const handleSubmit = (values, actions) => {
     axios.post('http://laravel-vue-youtube-clovon.test/api/appointments', form)
@@ -82,15 +90,15 @@ const handleSubmit = (values, actions) => {
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="date">Appointment Date</label>
-                                            <input v-model="form.start_time" type="date" class="form-control" id="date" :class="{'is-invalid' : errors.start_time}">
+                                            <label for="date">Start Date</label>
+                                            <input v-model="form.start_time" type="text" class="form-control flatpickr" id="date" :class="{'is-invalid' : errors.start_time}">
                                             <span class="text-danger">{{ errors.start_time }}</span>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="time">Appointment Time</label>
-                                            <input v-model="form.end_time" type="time" class="form-control" id="time" :class="{'is-invalid' : errors.end_time}">
+                                            <label for="time">End Date</label>
+                                            <input v-model="form.end_time" type="text" class="form-control flatpickr" id="time" :class="{'is-invalid' : errors.end_time}">
                                             <span class="text-danger">{{ errors.start_time }}</span>
                                         </div>
                                     </div>
