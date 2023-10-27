@@ -74,4 +74,23 @@ class AppointmentController extends Controller
 
         return response()->json(['success' => 'deleted successfully']);
     }
+
+    public function stats()
+    {
+        $appointmentCount = Appointment::query()
+            ->when(\request('status') == 'scheduled', function($query){
+                $query->where('status', AppointmentStatus::Scheduled);
+            })
+            ->when(\request('status') == 'confirmed', function($query){
+                $query->where('status', AppointmentStatus::Confirmed);
+            })
+            ->when(\request('status') == 'cancelled', function($query){
+                $query->where('status', AppointmentStatus::Cancelled);
+            })
+            ->count();
+
+        return response()->json([
+            'totalAppointmentsCount' => $appointmentCount
+        ]);
+    }
 }

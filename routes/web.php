@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function(){
     Route::delete('api/users', [\App\Http\Controllers\Admin\UserController::class, 'bulkDelete']);
 
     Route::get('api/appointments', [\App\Http\Controllers\Admin\AppointmentController::class, 'index']);
+    Route::get('api/stats/appointments', [\App\Http\Controllers\Admin\AppointmentController::class, 'stats']);
     Route::get('api/appointments/status', [\App\Http\Controllers\Admin\AppointmentStatusController::class, 'index']);
     Route::get('api/appointments/{appointment}', [\App\Http\Controllers\Admin\AppointmentController::class, 'show']);
     Route::post('api/appointments', [\App\Http\Controllers\Admin\AppointmentController::class, 'store']);
