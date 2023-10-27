@@ -19,6 +19,7 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function(){
     Route::get('api/users', [\App\Http\Controllers\Admin\UserController::class, 'index']);
+    Route::get('api/stats/users', [\App\Http\Controllers\Admin\UserController::class, 'stats']);
     Route::get('api/users/search', [\App\Http\Controllers\Admin\UserController::class, 'search']);
     Route::post('api/users', [\App\Http\Controllers\Admin\UserController::class, 'store']);
     Route::put('api/users/{user}/change-role', [\App\Http\Controllers\Admin\UserController::class, 'changeRole']);

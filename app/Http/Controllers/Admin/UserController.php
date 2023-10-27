@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Utilities\Date;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class UserController extends Controller
 {
@@ -66,5 +67,33 @@ class UserController extends Controller
         User::whereIn('id', $request->ids)->delete();
 
         return response()->noContent();
+    }
+
+    public function stats()
+    {
+        $totalUsersCount = User::query()
+            ->when(request('date_range') == 'today', function($query){
+                return $query->whereBetween('created_at', [Carbon::now()->today(), Carbon::now()]);
+            })
+            ->when(request('date_range') == '30_days', function($query){
+                return $query->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()]);
+            })
+            ->when(request('date_range') == '60_days', function($query){
+                return $query->whereBetween('created_at', [Carbon::now()->subDays(60), Carbon::now()]);
+            })
+            ->when(request('date_range') == '360_days', function($query){
+                return $query->whereBetween('created_at', [Carbon::now()->subDays(360), Carbon::now()]);
+            })
+            ->when(request('date_range') == 'month_to_date', function($query){
+                return $query->whereBetween('created_at', [Carbon::now()->firstOfMonth(), Carbon::now()]);
+            })
+            ->when(request('date_range') == 'month_to_date', function($query){
+                return $query->whereBetween('created_at', [Carbon::now()->firstOfYear(), Carbon::now()]);
+            })
+            ->count();
+
+        return response()->json([
+            'totalUsersCount' => $totalUsersCount
+        ]);
     }
 }
