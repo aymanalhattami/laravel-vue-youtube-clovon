@@ -9,16 +9,16 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::latest()->paginate(5);
+        $users = User::query()
+            ->when($request['query'], function($query, $search) {
+                $query->where('name', 'like', '%' . $search .  '%');
+            })
+            ->latest()
+            ->paginate(5);
 
         return $users;
-    }
-
-    public function search(Request $request)
-    {
-        return User::where('name', 'like', '%' . $request['query'] .  '%')->paginate(5);
     }
 
     public function store(Request $request)

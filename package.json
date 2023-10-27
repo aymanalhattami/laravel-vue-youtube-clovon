@@ -17,6 +17,7 @@
         "jquery": "^3.7.1",
         "laravel-vue-pagination": "^4.1.1",
         "lodash": "^4.17.21",
+        "sweetalert2": "^11.7.32",
         "vee-validate": "^4.11.8",
         "vue": "^3.3.6",
         "vue-router": "^4.2.5",

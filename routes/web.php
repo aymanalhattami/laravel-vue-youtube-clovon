@@ -30,6 +30,7 @@ Route::get('api/appointments/status', [\App\Http\Controllers\Admin\AppointmentSt
 Route::get('api/appointments/{appointment}', [\App\Http\Controllers\Admin\AppointmentController::class, 'show']);
 Route::post('api/appointments', [\App\Http\Controllers\Admin\AppointmentController::class, 'store']);
 Route::put('api/appointments/{appointment}', [\App\Http\Controllers\Admin\AppointmentController::class, 'update']);
+Route::delete('api/appointments/{appointment}', [\App\Http\Controllers\Admin\AppointmentController::class, 'destroy']);
 
 Route::get('api/clients', [\App\Http\Controllers\Admin\ClientController::class, 'index']);
 

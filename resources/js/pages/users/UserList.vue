@@ -28,7 +28,11 @@ const editUserSchema = yub.object({
 });
 
 const getUsers = (page = 1) => {
-    axios.get(`http://laravel-vue-youtube-clovon.test/api/users?page=${page}`).then((response) => {
+    axios.get(`http://laravel-vue-youtube-clovon.test/api/users?page=${page}`, {
+        params: {
+            query: searchQuery.value
+        }
+    }).then((response) => {
         users.value = response.data;
         selectedUsers.value = [];
         selectAll.value = false;
@@ -90,21 +94,8 @@ const handleSubmit = (values, actions) => {
 const searchQuery = ref(null);
 
 watch(searchQuery, debounce(() => {
-    search();
+    getUsers();
 }, 300))
-
-const search = () => {
-    axios.get('http://laravel-vue-youtube-clovon.test/api/users/search', {
-        params: {
-            query: searchQuery.value
-        }
-    })
-        .then((response) => {
-            users.value = response.data;
-        }).catch((error) => {
-            toastr.error(error.response.data.message)
-    })
-}
 
 const selectedUsers = ref([]);
 

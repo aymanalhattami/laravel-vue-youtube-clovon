@@ -1,6 +1,7 @@
 <script setup>
 import {onMounted, ref} from "vue";
-import { useToastr } from "@/toastr.js";
+import {useToastr} from "@/toastr.js";
+import Swal from "sweetalert2";
 
 const toastr = useToastr();
 
@@ -35,6 +36,30 @@ onMounted(() => {
                 toastr.error(error.response.data.message);
         })
     }
+
+const deleteAppointment = (id) => {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            axios.delete(`http://laravel-vue-youtube-clovon.test/api/appointments/${id}`)
+                .then(() => {
+                    appointments.value.data = appointments.value.data.filter((appointment) => appointment.id !== id );
+                    Swal.fire(
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
+                    )
+                })
+        }
+    })
+}
 </script>
 
 <template>
@@ -105,7 +130,7 @@ onMounted(() => {
                                                     <i class="fa fa-edit mr-2"></i>
                                                 </router-link>
 
-                                                <a href="">
+                                                <a href="" @click.prevent="deleteAppointment(appointment.id)">
                                                     <i class="fa fa-trash text-danger"></i>
                                                 </a>
                                             </td>
