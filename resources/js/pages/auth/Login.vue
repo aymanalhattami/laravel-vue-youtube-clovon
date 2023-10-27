@@ -1,5 +1,5 @@
 <script setup>
-import {reactive} from "vue";
+import {reactive, ref} from "vue";
 import axios from "axios";
 import {useRouter} from "vue-router";
 
@@ -10,14 +10,22 @@ const form = reactive({
     password: ''
 });
 
+const errorMessage = ref('');
+const loading = ref(false);
+
 const handleSubmit = () => {
+    loading.value = true;
+    errorMessage.value = '';
     axios.post('http://laravel-vue-youtube-clovon.test/login', form)
         .then((response) => {
             window.location.href = 'http://laravel-vue-youtube-clovon.test/admin/dashboard'
             // router.push('http://laravel-vue-youtube-clovon.test/admin/dashboard');
         })
         .catch((error) => {
-            alert('error');
+            errorMessage.value = error.response.data.message;
+        })
+        .finally(() => {
+            loading.value = false;
         })
 }
 
@@ -32,6 +40,9 @@ const handleSubmit = () => {
             </div>
             <div class="card-body">
                 <p class="login-box-msg">Sign in to start your session</p>
+                <div v-if="errorMessage" class="alert alert-danger">
+                    {{ errorMessage }}
+                </div>
                 <form @submit.prevent="handleSubmit">
                     <div class="input-group mb-3">
                         <input v-model="form.email" class="form-control" placeholder="Email" type="email">
@@ -60,7 +71,10 @@ const handleSubmit = () => {
                         </div>
 
                         <div class="col-4">
-                            <button class="btn btn-primary btn-block" type="submit">Sign In</button>
+                            <button class="btn btn-primary btn-block" type="submit">
+                                <span v-if="loading" class="spinner-border spinner-border-sm" role="status"></span>
+                                <span v-else>Sign In</span>
+                            </button>
                         </div>
 
                     </div>
